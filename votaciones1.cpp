@@ -8,18 +8,23 @@ void interaction(std::vector<int> &latt);
 void print_gnuplot(std::vector<int> &latt);
 void start_gnuplot(void);
 void clean_lattice(std::vector<int> &latt);
+bool stop(std::vector<int> &latt);
 
 int main (void){
-  const int N = 4;
-  const int repetitions = 10000 ;
+  const int N = 6;
+  const int repetitions = 5000 ;
   const int voters = 1;
   std::vector<int> latt (N*N);
-  start_gnuplot();
+  //start_gnuplot();
   //random values 0 and 1 on the lattice 
   initialize_lattice(latt);
   for (int ii = 0 ; ii < repetitions ; ii++){
-    print_gnuplot(latt);
+    //print_gnuplot(latt);
     interaction(latt);
+    if(stop(latt) == true){
+      std::cout << ii << std::endl;
+      break;
+    }
   }
   clean_lattice(latt);
   return 0;
@@ -93,8 +98,10 @@ void interaction(std::vector<int> &latt){
   int test1 = dis2(gen);
   int test2 = dis3(gen);
   int test3 = dis4(gen);
+  
   //borde superior
-  if(ii == 0 || (jj>0 && jj < N-1)){
+  if(ii == 0 && (jj>0 && jj < N-1)){
+
     if(test2 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
@@ -112,7 +119,7 @@ void interaction(std::vector<int> &latt){
     }
   }
   //borde inferior
-  else if(ii == N-1 || (jj>0 && jj < N-1)){
+  else if(ii == N-1 && (jj>0 && jj < N-1)){
     if(test2 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
@@ -130,7 +137,7 @@ void interaction(std::vector<int> &latt){
     }
   }
   //borde izquierdo
-  else if(jj == 0 || (ii>0 && ii < N-1)){
+  else if(jj == 0 && (ii>0 && ii < N-1)){
     if(test2 == 1){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
@@ -148,7 +155,7 @@ void interaction(std::vector<int> &latt){
     }
   }
   //borde derecho
-  else if(jj == N-1 || (ii>0 && ii < N-1)){
+  else if(jj == N-1 && (ii>0 && ii < N-1)){
     if(test2 == 1){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
@@ -167,7 +174,7 @@ void interaction(std::vector<int> &latt){
   }
 
   //the tips of the lattice
-  else if(ii == 0 || jj == 0){
+  else if(ii == 0 && jj == 0){
     if(test3 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
@@ -178,7 +185,7 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
   }
-  else if(ii == 0 || jj == N-1){
+  else if(ii == 0 && jj == N-1){
     if(test3 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
@@ -190,7 +197,7 @@ void interaction(std::vector<int> &latt){
     }
   }
 
-  else if(ii == N-1 || jj == 0){
+  else if(ii == N-1 && jj == 0){
     if(test3 == 1){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
@@ -201,7 +208,7 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
   }
-  else if(ii == N-1 || jj == N-1){
+  else if(ii == N-1 && jj == N-1){
     if(test3 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
@@ -213,7 +220,8 @@ void interaction(std::vector<int> &latt){
     }
   }
   //the rest of the lattice
-  else{ if(test1 == 1){
+  else{
+    if(test1 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
     if(test1 == 2){
@@ -238,4 +246,18 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
     }
   }
+}
+
+bool stop(std::vector<int> &latt){
+  int N = std::sqrt(latt.size());
+  int sum = 0;
+  for(int ii = 0 ; ii < N ; ii++){
+    for(int jj = 0 ; jj < N ; jj++){
+      sum += latt[ii*N+jj];
+    }
+  }
+  if(sum == N*N || sum == 0){
+    return true;
+  }
+  return false;
 }
