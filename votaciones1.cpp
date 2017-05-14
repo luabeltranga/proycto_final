@@ -11,28 +11,30 @@ void clean_lattice(std::vector<int> &latt);
 bool stop(std::vector<int> &latt);
 
 int main (void){
-  const int N = 6;
-  const int repetitions = 5000 ;
-  const int voters = 1;
+  const int N = 10;
+  const int repetitions = 100000; 
   std::vector<int> latt (N*N);
   //start_gnuplot();
   //random values 0 and 1 on the lattice 
-  initialize_lattice(latt);
-  for (int ii = 0 ; ii < repetitions ; ii++){
-    //print_gnuplot(latt);
-    interaction(latt);
-    if(stop(latt) == true){
-      std::cout << ii << std::endl;
+  for(int jj = 0; jj < 1; jj++){
+    initialize_lattice(latt);
+    for (int ii = 0 ; ii < repetitions ; ii++){
+      // print_gnuplot(latt);
+      interaction(latt);
+      if(stop(latt) == true){
+	 std::cout << ii << std::endl;
       break;
+      }
     }
+    clean_lattice(latt);
   }
-  clean_lattice(latt);
+  
   return 0;
 }
 
 void initialize_lattice (std::vector<int> &latt){
   std::random_device rd;
-  std::mt19937 gen(rd());
+  std::mt19937 gen(10);
   std::uniform_int_distribution<int> dis(0,1);
   int ii = 0;
   int jj = 0;
@@ -48,7 +50,7 @@ void clean_lattice(std::vector<int> &latt){
   int N = std::sqrt(latt.size());
     for(int ii = 0 ; ii < N ; ii++){
       for(int jj = 0 ; jj < N ; jj++){
-	latt[ii*N+jj] = 0;;
+	latt[ii*N+jj] = 0;
       }
     }  
 }
@@ -250,13 +252,18 @@ void interaction(std::vector<int> &latt){
 
 bool stop(std::vector<int> &latt){
   int N = std::sqrt(latt.size());
-  int sum = 0;
+  unsigned long sum = 0;
   for(int ii = 0 ; ii < N ; ii++){
     for(int jj = 0 ; jj < N ; jj++){
       sum += latt[ii*N+jj];
     }
   }
-  if(sum == N*N || sum == 0){
+  if(sum == N*N){
+    std::cout << "win 1" << std::endl;
+    return true;
+  }
+  if(sum == 0){
+    std::cout << "win 0" << std::endl;
     return true;
   }
   return false;
