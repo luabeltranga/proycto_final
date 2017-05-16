@@ -23,19 +23,19 @@ int main (void){
   const int max = 100000; 
 
   //numero de repeticiones
-  const int rep = 20;
+  const int rep = 1;
   //creacion de la malla como vector unidimensional
   std::vector<int> latt (N*N);
-  //start_gnuplot();
+  start_gnuplot();
 
   for(int jj = 0; jj < rep; jj++){
     
     initialize_lattice(latt);
     for (int ii = 0 ; ii < max ; ii++){
-      // print_gnuplot(latt);
+      print_gnuplot(latt);
       interaction(latt);
       if(stop(latt) == true){
-	 std::cout << ii << std::endl;
+	//std::cout << ii << std::endl;
       break;
       }
     }
@@ -71,9 +71,7 @@ void initialize_lattice (std::vector<int> &latt){
 void clean_lattice(std::vector<int> &latt){
   int N = std::sqrt(latt.size());
     for(int ii = 0 ; ii < N ; ii++){
-      for(int jj = 0 ; jj < N ; jj++){
-	latt[ii*N+jj] = 0;
-      }
+      latt[ii*N] = 0;
     }  
 }
 
@@ -83,9 +81,7 @@ void print_gnuplot(std::vector<int> &latt){
   std::cout<<"plot [-0.5:"<< N-0.5 <<"] [-0.5:"<< N-0.5 <<"] '-'  matrix with image "<< std::endl;
   //std::cout << "plot '-' matrix with image " << std::endl;
   for(int ii = 0 ; ii < N ; ii++){
-    for(int jj = 0 ; jj < N ; jj++){
-      std::cout << latt[ii*N+jj] << " ";
-    }
+    std::cout << latt[ii*N+jj] << " ";
     std::cout << std::endl;    
   }
   std::cout << "e " << std::endl;
@@ -118,171 +114,33 @@ void interaction(std::vector<int> &latt){
   std::uniform_int_distribution<int> dis1(0,N-1);
   
   //para la eleccion de los vecinos de elementos fuera de la frontera
-  std::uniform_int_distribution<int> dis2(1,8);
-  
-  //para la eleccion de los vecinos sobre la frontera sin esquinas
-  std::uniform_int_distribution<int> dis3(1,5);
-  
-  //para la eleccion de los vecinos en las esquinas
-  std::uniform_int_distribution<int> dis4(1,3);
-
+  std::uniform_int_distribution<int> dis2(1,2);
+ 
   //genera coordenadas en la malla
   int ii = dis1(gen);
-  int jj = dis1(gen);
+
 
   //pruebas para eleccion de vecinos
   int test1 = dis2(gen);
-  int test2 = dis3(gen);
-  int test3 = dis4(gen);
   
   //implementacion de interaccion en borde superior 
-  if(ii == 0 && (jj>0 && jj < N-1)){
-
-    if(test2 == 1){
-      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
-    }
-    if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test2 == 3){
-      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
-    }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test2 == 5){
-      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
-    }
+  if(ii == 0){
+    latt[ii*N] = latt[(ii+1)*N];
   }
   //implementacion de interaccion en borde inferior
-  else if(ii == N-1 && (jj>0 && jj < N-1)){
-    if(test2 == 1){
-      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
-    }
-    if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test2 == 3){
-      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
-    if(test2 == 5){
-      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
-    }
+  else if(ii == N-1){
+    latt[ii*N] = latt[(ii-1)*N];    
   }
-  //implementacion de interaccion en borde izquierdo
-  else if(jj == 0 && (ii>0 && ii < N-1)){
-    if(test2 == 1){
-      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-    if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
-    if(test2 == 3){
-      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
-    }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test2 == 5){
-      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
-    }
-  }
-  //implementacion de interaccion en borde derecho
-  else if(jj == N-1 && (ii>0 && ii < N-1)){
-    if(test2 == 1){
-      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-    if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test2 == 3){
-      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
-    }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test2 == 5){
-      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
-    }
-  }
-
-  //implementacion de interaccion en las esquinas de la malla
-  else if(ii == 0 && jj == 0){
-    if(test3 == 1){
-      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
-    }
-    if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test3 == 3){
-      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
-    }
-  }
-  else if(ii == 0 && jj == N-1){
-    if(test3 == 1){
-      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
-    }
-    if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test3 == 3){
-      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
-    }
-  }
-
-  else if(ii == N-1 && jj == 0){
-    if(test3 == 1){
-      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-    if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
-    if(test3 == 3){
-      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
-    }
-  }
-  else if(ii == N-1 && jj == N-1){
-    if(test3 == 1){
-      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
-    }
-    if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test3 == 3){
-      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-  }
-
   
   //implementacion de interaccion en el interior de la malla
   else{
     if(test1 == 1){
-      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
+      latt[ii*N] = latt[(ii+1)*N];    
     }
     if(test1 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
+      latt[ii*N] = latt[(ii-1)*N];    
     }
-    if(test1 == 3){
-      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
-    }
-    if(test1 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test1 == 5){
-      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
-    }
-    if(test1 == 6){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test1 == 7){
-      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-    if(test1 == 8){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
+    
   }
 }
 
@@ -296,12 +154,12 @@ bool stop(std::vector<int> &latt){
       sum += latt[ii*N+jj];
     }
   }
-  if(sum == N*N){
-    std::cout << "win 1" << std::endl;
+  if(sum == N){
+    //std::cout << "win 1" << std::endl;
     return true;
   }
   if(sum == 0){
-    std::cout << "win -1" << std::endl;
+    //std::cout << "win -1" << std::endl;
     return true;
   }
   return false;
