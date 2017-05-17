@@ -1,8 +1,3 @@
-//para crear el gif descomentar start_gnuplot y print gnuplot, comentar en stop
-//los cout y dentro del buqle de repeticiones el cout
-
-
-//compilar con make vot1 en consola
 #include <iostream>
 #include <random>
 #include <vector>
@@ -10,14 +5,12 @@
 
 void initialize_lattice (std::vector<int> &latt);
 void interaction(std::vector<int> &latt);
-void print_gnuplot(std::vector<int> &latt);
-void start_gnuplot(void);
 void clean_lattice(std::vector<int> &latt);
 bool stop(std::vector<int> &latt);
 
 int main (void){
-  //tamaÃ±o de la malla
-  const int N = 10;
+  //tamaño de la malla
+  const int N = 3;
 
   //numero de pasos maximos para alcanzar el consenso
   const int max = 100000; 
@@ -32,9 +25,7 @@ int main (void){
     
     initialize_lattice(latt);
     for (int ii = 0 ; ii < max ; ii++){
-      // print_gnuplot(latt);
       interaction(latt);
-      std::cout << ii << std::endl;
       if(stop(latt) == true){
 	std::cout << ii << std::endl;
       break;
@@ -61,46 +52,24 @@ void initialize_lattice (std::vector<int> &latt){
   int ii = 0;
   int jj = 0;
   int N = std::cbrt(latt.size());
-    for(int ii = 0 ; ii < N ; ii++){
-      for(int jj = 0 ; jj < N ; jj++){
-	latt[ii*N+jj] = dis(gen);
-      }
-    }  
-}
-
-//limpia la malla para correr de nuevo 
-void clean_lattice(std::vector<int> &latt){
-  int N = std::cbrt(latt.size());
-    for(int ii = 0 ; ii < N ; ii++){
-      for(int jj = 0 ; jj < N ; jj++){
-	latt[ii*N+jj] = 0;
-      }
-    }  
-}
-
-//imprime la malla en gnuplot(opcional)
-void print_gnuplot(std::vector<int> &latt){
-  const int N = std::cbrt(latt.size());
-  std::cout<<"plot [-0.5:"<< N-0.5 <<"] [-0.5:"<< N-0.5 <<"] '-'  matrix with image "<< std::endl;
-  //std::cout << "plot '-' matrix with image " << std::endl;
   for(int ii = 0 ; ii < N ; ii++){
     for(int jj = 0 ; jj < N ; jj++){
-      std::cout << latt[ii*N+jj] << " ";
-    }
-    std::cout << std::endl;    
+      for(int kk = 0 ; kk < N ; kk++){     
+	latt[ii*N*N+jj*N+kk] = dis(gen);
+      }
+    }  
   }
-  std::cout << "e " << std::endl;
-  std::cout << "e " << std::endl;
 }
-//inicia gnuplot con opciones de gif (opcional)
-void start_gnuplot(void){
-  std::cout << "unset key" << std::endl;
-  std::cout << "set palette model RGB" << std::endl;
-  std::cout << "unset colorbox" << std::endl;
-  std::cout << "unset tics" << std::endl;
-  std::cout << "set terminal gif animate " << std::endl;
-  std::cout << "set out 'vot.gif'" << std::endl;
-  std::cout << std::endl;
+  //limpia la malla para correr de nuevo 
+void clean_lattice(std::vector<int> &latt){
+  int N = std::cbrt(latt.size());
+  for(int ii = 0 ; ii < N ; ii++){
+    for(int jj = 0 ; jj < N ; jj++){
+      for(int kk = 0 ; kk < N ; kk++){
+	latt[ii*N*N + jj*N + kk] = 0;
+      }
+    }  
+  }
 }
 
 
@@ -139,117 +108,24 @@ void interaction(std::vector<int> &latt){
   int test1 = dis2(gen);
   int test2 = dis3(gen);
   int test3 = dis4(gen);
-  
-  //implementacion de interaccion en las caras 
-  if(ii == 0 && (jj>0 && jj < N-1) && (kk > 0 && kk < N-1)){
-    
+   //implementacion de interaccion en caras 
+  if(kk == 0 && (jj>0 && jj < N-1) && (ii > 0 && ii < N-1)){
+
     if(test2 == 1){
-      latt[ii*N+jj*N+kk] = latt[ii*N+jj*N+(kk+1)];    
+      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
     if(test2 == 2){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj+1)*N+(kk+1)];    
+      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
     }
     if(test2 == 3){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj+1)*N+kk];    
+      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
     if(test2 == 4){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj+1)*N+(kk-1)];    
+      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
     }
     if(test2 == 5){
-      latt[ii*N+jj*N+kk] = latt[ii*N+jj*N+(kk-1)];    
+      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
-    if(test2 == 6){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test2 == 7){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj-1)*N+kk];    
-    }
-    if(test2 == 8){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test2 == 9){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+jj*N+(kk+1)];    
-    }
-    if(test2 == 10){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+(jj+1)*N+(kk+1)];    
-    }
-    if(test2 == 11){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+(jj+1)*N+kk];    
-    }
-    if(test2 == 12){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+(jj+1)*N+(kk-1)];    
-    }
-    if(test2 == 13){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+jj*N+(kk-1)];    
-    }
-    if(test2 == 14){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test2 == 15){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+(jj-1)*N+kk];    
-    }
-    if(test2 == 16){
-      latt[ii*N+jj*N+kk] = latt[(ii+1)*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test2 == 17){
-      latt[ii*N+jj*N+kk] = latt[ii*N+jj*N+(kk+1)];    
-    }
-    
-  }
-  if(ii == N-1 && (jj>0 && jj < N-1) && (kk > 0 && kk < N-1)){
-    
-    if(test2 == 1){
-      latt[ii*N+jj*N+kk] = latt[ii*N+jj*N+(kk+1)];    
-    }
-    if(test2 == 2){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj+1)*N+(kk+1)];    
-    }
-    if(test2 == 3){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj+1)*N+kk];    
-    }
-    if(test2 == 4){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj+1)*N+(kk-1)];    
-    }
-    if(test2 == 5){
-      latt[ii*N+jj*N+kk] = latt[ii*N+jj*N+(kk-1)];    
-    }
-    if(test2 == 6){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test2 == 7){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj-1)*N+kk];    
-    }
-    if(test2 == 8){
-      latt[ii*N+jj*N+kk] = latt[ii*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test2 == 9){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+jj*N+(kk+1)];    
-    }
-    if(test2 == 10){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+(jj+1)*N+(kk+1)];    
-    }
-    if(test2 == 11){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+(jj+1)*N+kk];    
-    }
-    if(test2 == 12){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+(jj+1)*N+(kk-1)];    
-    }
-    if(test2 == 13){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+jj*N+(kk-1)];    
-    }
-    if(test2 == 14){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test2 == 15){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+(jj-1)*N+kk];    
-    }
-    if(test2 == 16){
-      latt[ii*N+jj*N+kk] = latt[(ii-1)*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test2 == 17){
-      latt[ii*N+jj*N+kk] = latt[ii*N+jj*N+(kk-1)];    
-    }
-    
   }
   //implementacion de interaccion en borde inferior
   else if(ii == N-1 && (jj>0 && jj < N-1)){
@@ -357,85 +233,33 @@ void interaction(std::vector<int> &latt){
   //implementacion de interaccion en el interior de la malla
   else{
     if(test1 == 1){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+jj*N+kk];    
+      latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
     if(test1 == 2){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+(jj+1)*N+kk];    
+      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
     }
     if(test1 == 3){
-      latt[ii*N+jj*N+kk]=latt[ii*N+(jj+1)*N+kk];    
+      latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
     if(test1 == 4){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+(jj+1)*N+kk];    
+      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
     }
     if(test1 == 5){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+jj*N+kk];    
+      latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
     if(test1 == 6){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+(jj-1)*N+kk];    
+      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
     }
     if(test1 == 7){
-      latt[ii*N+jj*N+kk]=latt[ii*N+(jj-1)*N+kk];    
+      latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
     if(test1 == 8){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+(jj-1)*N+kk];    
-    }
-    if(test1 == 9){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+jj*N+(kk+1)];    
-    }
-    if(test1 == 10){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+(jj+1)*N+(kk+1)];    
-    }
-    if(test1 == 11){
-      latt[ii*N+jj*N+kk]=latt[ii*N+(jj+1)*N+(kk+1)];    
-    }
-    if(test1 == 12){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+(jj+1)*N+(kk+1)];    
-    }
-    if(test1 == 13){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+jj*N+(kk+1)];    
-    }
-    if(test1 == 14){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test1 == 15){
-      latt[ii*N+jj*N+kk]=latt[ii*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test1 == 16){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+(jj-1)*N+(kk+1)];    
-    }
-    if(test1 == 17){
-      latt[ii*N+jj*N+kk]=latt[ii*N+jj*N+(kk+1)];    
-    }
-    if(test1 == 18){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+jj*N+(kk-1)];    
-    }
-    if(test1 == 19){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+(jj+1)*N+(kk-1)];    
-    }
-    if(test1 == 20){
-      latt[ii*N+jj*N+kk]=latt[ii*N+(jj+1)*N+(kk-1)];    
-    }
-    if(test1 == 21){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+(jj+1)*N+(kk-1)];    
-    }
-    if(test1 == 22){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+jj*N+(kk-1)];    
-    }
-    if(test1 == 23){
-      latt[ii*N+jj*N+kk]=latt[(ii-1)*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test1 == 24){
-      latt[ii*N+jj*N+kk]=latt[ii*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test1 == 25){
-      latt[ii*N+jj*N+kk]=latt[(ii+1)*N+(jj-1)*N+(kk-1)];    
-    }
-    if(test1 == 26){
-      latt[ii*N+jj*N+kk]=latt[ii*N+jj*N+(kk-1)];    
+      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
     }
   }
+  
 }
+
 
 
 

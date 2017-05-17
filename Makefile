@@ -1,6 +1,6 @@
 CC=g++
-#CCFLAGS= -std=c++11 -fsanitize=address -fsanitize=leak -fsanitize=undefined 
-CCFLAGS= -std=c++11 -ggdb -g	
+CCFLAGS= -std=c++14 -fsanitize=address -fsanitize=leak -fsanitize=undefined 
+#CCFLAGS= -std=c++11 -ggdb -g	
 vot1d: votaciones1d.cpp
 	$(CC) $(CCFLAGS) votaciones1d.cpp
 vot2d: votaciones2d.cpp

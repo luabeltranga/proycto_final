@@ -17,7 +17,7 @@ bool stop(std::vector<int> &latt);
 
 int main (void){
   //tamaño de la malla
-  const int N = 10;
+  const int N = 4;
 
   //numero de pasos maximos para alcanzar el consenso
   const int max = 100000; 
@@ -26,13 +26,13 @@ int main (void){
   const int rep = 1;
   //creacion de la malla como vector unidimensional
   std::vector<int> latt (N*N);
-  // start_gnuplot();
+  //start_gnuplot();
 
   for(int jj = 0; jj < rep; jj++){
     
     initialize_lattice(latt);
     for (int ii = 0 ; ii < max ; ii++){
-      // print_gnuplot(latt);
+      //print_gnuplot(latt);
       interaction(latt);
       if(stop(latt) == true){
 	std::cout << ii << std::endl;
