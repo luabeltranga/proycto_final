@@ -1,8 +1,3 @@
-//para crear el gif descomentar start_gnuplot y print gnuplot, comentar en stop
-//los cout y dentro del buqle de repeticiones el cout
-
-
-//compilar con make vot1d en consola
 #include <iostream>
 #include <random>
 #include <vector>
@@ -17,26 +12,24 @@ bool stop(std::vector<int> &latt);
 
 int main (void){
   //tamaño de la malla
-  const int N = 10;
+  const int N = 4;
 
   //numero de pasos maximos para alcanzar el consenso
-  const int max = 100; 
+  const int max = 100000; 
 
   //numero de repeticiones
-  const int rep = 100;
+  const int rep = 1;
   //creacion de la malla como vector unidimensional
   std::vector<int> latt (N);
-  start_gnuplot();
   
   for(int jj = 0; jj < rep; jj++){
     
     initialize_lattice(latt);
 
     for (int ii = 0 ; ii < max ; ii++){
-      print_gnuplot(latt);
       interaction(latt);
       if(stop(latt) == true){
-	//std::cout << ii << std::endl;
+	std::cout << ii << std::endl;
       break;
       }
     }
@@ -52,7 +45,7 @@ void initialize_lattice (std::vector<int> &latt){
   std::random_device rd;
   
   //generador de numeros aleatorios para el llenado de la malla
-  std::mt19937 gen(10);
+  std::mt19937_64 gen(10);
   
   //funcion que toma el generador de numeros aleatorios para la
   //generacion de numeros entre 0 y 1 usando una distribucion uniforme
@@ -73,42 +66,10 @@ void clean_lattice(std::vector<int> &latt){
   }  
 }
 
-//imprime la malla en gnuplot(opcional)
-void print_gnuplot(std::vector<int> &latt){
-  const int N = latt.size();
-  std::cout<<"plot [-0.5:"<< N-0.5 <<"] [-0.5:"<< N-0.5 <<"] '-'  matrix with image "<< std::endl;
-  //std::cout << "plot '-' matrix with image " << std::endl;
-  for(int ii = 0 ; ii < N ; ii++){
-    std::cout << latt[ii] << " ";
-  }
-  std::cout << std::endl;    
-  for(int ii = 0 ; ii < N ; ii++){
-    std::cout << latt[ii] << " ";
-  }
-  std::cout << std::endl;    
-  std::cout << "e " << std::endl;
-  std::cout << "e " << std::endl;
-}
-
-
-
-//inicia gnuplot con opciones de gif (opcional)
-void start_gnuplot(void){
-  std::cout << "unset key" << std::endl;
-  std::cout << "set palette model RGB" << std::endl;
-  std::cout << "unset colorbox" << std::endl;
-  std::cout << "unset tics" << std::endl;
-  std::cout << "set terminal gif animate " << std::endl;
-  std::cout << "set out 'vot.gif'" << std::endl;
-  std::cout << std::endl;
-}
-
-
-
 //inicia el intercambio
 void interaction(std::vector<int> &latt){
   
-  int N = std::sqrt(latt.size());
+  int N = latt.size();
   //generador de la semilla para el generador de numeros aleatorios
   std::random_device rd;
 
@@ -158,11 +119,11 @@ bool stop(std::vector<int> &latt){
       sum += latt[ii];
   }
   if(sum == N){
-    //std::cout << "win 1" << std::endl;
+    std::cout << "win 1" << std::endl;
     return true;
   }
   if(sum == 0){
-    //std::cout << "win -1" << std::endl;
+    std::cout << "win -1" << std::endl;
     return true;
   }
   return false;

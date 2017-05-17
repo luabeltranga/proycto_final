@@ -26,16 +26,16 @@ int main (void){
   const int rep = 1;
   //creacion de la malla como vector unidimensional
   std::vector<int> latt (N*N);
-  start_gnuplot();
+  // start_gnuplot();
 
   for(int jj = 0; jj < rep; jj++){
     
     initialize_lattice(latt);
     for (int ii = 0 ; ii < max ; ii++){
-      print_gnuplot(latt);
+      // print_gnuplot(latt);
       interaction(latt);
       if(stop(latt) == true){
-	//std::cout << ii << std::endl;
+	std::cout << ii << std::endl;
       break;
       }
     }
@@ -297,11 +297,11 @@ bool stop(std::vector<int> &latt){
     }
   }
   if(sum == N*N){
-    //std::cout << "win 1" << std::endl;
+    std::cout << "win 1" << std::endl;
     return true;
   }
   if(sum == 0){
-    //std::cout << "win -1" << std::endl;
+    std::cout << "win -1" << std::endl;
     return true;
   }
   return false;
