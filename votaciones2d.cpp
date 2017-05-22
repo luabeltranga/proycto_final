@@ -8,17 +8,19 @@
 #include <vector>
 #include <cmath>
 
-void initialize_lattice (std::vector<int> &latt);
+void initialize_lattice (const double & rho,std::vector<int> &latt); 
 void interaction(std::vector<int> &latt);
-void print_gnuplot(std::vector<int> &latt);
-void start_gnuplot(void);
 void clean_lattice(std::vector<int> &latt);
-bool stop(std::vector<int> &latt);
+bool density(const double & rho,const std::vector<int> &latt);
+bool stop(const std::vector<int> &latt);
 
 int main (void){
   //tamaño de la malla
-  const int N = 4;
+  const int N = 10;
 
+  //densidad de 1
+  const double rho = 0.9;
+  
   //numero de pasos maximos para alcanzar el consenso
   const int max = 100000; 
 
@@ -26,13 +28,12 @@ int main (void){
   const int rep = 1;
   //creacion de la malla como vector unidimensional
   std::vector<int> latt (N*N);
-  //start_gnuplot();
 
   for(int jj = 0; jj < rep; jj++){
     
-    initialize_lattice(latt);
+    initialize_lattice(rho,latt);
+
     for (int ii = 0 ; ii < max ; ii++){
-      //print_gnuplot(latt);
       interaction(latt);
       if(stop(latt) == true){
 	std::cout << ii << std::endl;
@@ -46,7 +47,10 @@ int main (void){
 }
 
 //llena de forma aleatoria la malla de 0 y 1
-void initialize_lattice (std::vector<int> &latt){
+void initialize_lattice (const double  & rho,std::vector<int> &latt){
+
+  int N = std::sqrt(latt.size());
+  
   //generador de semilla aleatoria
   std::random_device rd;
 
@@ -56,15 +60,19 @@ void initialize_lattice (std::vector<int> &latt){
   //funcion que toma el generador de numeros aleatorios para la
   //generacion de numeros entre 0 y 1 usando una distribucion uniforme
   //los cuales se asignan a la malla
-  std::uniform_int_distribution<int> dis(0,1);
+  std::uniform_int_distribution<int> dis1(0,1);
+  std::uniform_int_distribution<int> dis2(0,N-1);
+  
   int ii = 0;
   int jj = 0;
-  int N = std::sqrt(latt.size());
-    for(int ii = 0 ; ii < N ; ii++){
-      for(int jj = 0 ; jj < N ; jj++){
-	latt[ii*N+jj] = dis(gen);
-      }
-    }  
+  while(density(rho,latt)){
+    ii=dis2(gen);
+    jj=dis2(gen);
+    if(latt[ii*N+jj] == 1)continue;
+    else latt[ii*N+jj] = dis1(gen);
+  }
+  
+	
 }
 
 //limpia la malla para correr de nuevo 
@@ -76,32 +84,6 @@ void clean_lattice(std::vector<int> &latt){
       }
     }  
 }
-
-//imprime la malla en gnuplot(opcional)
-void print_gnuplot(std::vector<int> &latt){
-  const int N = std::sqrt(latt.size());
-  std::cout<<"plot [-0.5:"<< N-0.5 <<"] [-0.5:"<< N-0.5 <<"] '-'  matrix with image "<< std::endl;
-  //std::cout << "plot '-' matrix with image " << std::endl;
-  for(int ii = 0 ; ii < N ; ii++){
-    for(int jj = 0 ; jj < N ; jj++){
-      std::cout << latt[ii*N+jj] << " ";
-    }
-    std::cout << std::endl;    
-  }
-  std::cout << "e " << std::endl;
-  std::cout << "e " << std::endl;
-}
-//inicia gnuplot con opciones de gif (opcional)
-void start_gnuplot(void){
-  std::cout << "unset key" << std::endl;
-  std::cout << "set palette model RGB" << std::endl;
-  std::cout << "unset colorbox" << std::endl;
-  std::cout << "unset tics" << std::endl;
-  std::cout << "set terminal gif animate " << std::endl;
-  std::cout << "set out 'vot.gif'" << std::endl;
-  std::cout << std::endl;
-}
-
 
 
 //inicia el intercambio
@@ -118,13 +100,13 @@ void interaction(std::vector<int> &latt){
   std::uniform_int_distribution<int> dis1(0,N-1);
   
   //para la eleccion de los vecinos de elementos fuera de la frontera
-  std::uniform_int_distribution<int> dis2(1,8);
+  std::uniform_int_distribution<int> dis2(1,4);
   
   //para la eleccion de los vecinos sobre la frontera sin esquinas
-  std::uniform_int_distribution<int> dis3(1,5);
+  std::uniform_int_distribution<int> dis3(1,3);
   
   //para la eleccion de los vecinos en las esquinas
-  std::uniform_int_distribution<int> dis4(1,3);
+  std::uniform_int_distribution<int> dis4(1,2);
 
   //genera coordenadas en la malla
   int ii = dis1(gen);
@@ -141,16 +123,12 @@ void interaction(std::vector<int> &latt){
     if(test2 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
+    
     if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test2 == 3){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test2 == 5){
+    
+    if(test2 == 3){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
   }
@@ -159,16 +137,12 @@ void interaction(std::vector<int> &latt){
     if(test2 == 1){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
+    
     if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test2 == 3){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
-    if(test2 == 5){
+    
+    if(test2 == 3){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
   }
@@ -178,15 +152,9 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
     if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
-    if(test2 == 3){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test2 == 5){
+    if(test2 == 3){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
   }
@@ -196,15 +164,9 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
     if(test2 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test2 == 3){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
-    if(test2 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test2 == 5){
+    if(test2 == 3){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
   }
@@ -215,9 +177,6 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
     if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test3 == 3){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
   }
@@ -226,9 +185,6 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
     if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test3 == 3){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
   }
@@ -238,9 +194,6 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
     if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
-    }
-    if(test3 == 3){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
   }
@@ -249,9 +202,6 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
     if(test3 == 2){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test3 == 3){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
     }
   }
@@ -263,32 +213,20 @@ void interaction(std::vector<int> &latt){
       latt[ii*N+jj] = latt[ii*N+(jj+1)];    
     }
     if(test1 == 2){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj+1)];    
-    }
-    if(test1 == 3){
       latt[ii*N+jj] = latt[(ii+1)*N+jj];    
     }
-    if(test1 == 4){
-      latt[ii*N+jj] = latt[(ii+1)*N+(jj-1)];    
-    }
-    if(test1 == 5){
+    if(test1 == 3){
       latt[ii*N+jj] = latt[ii*N+(jj-1)];    
     }
-    if(test1 == 6){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj-1)];    
-    }
-    if(test1 == 7){
+    if(test1 == 4){
       latt[ii*N+jj] = latt[(ii-1)*N+jj];    
-    }
-    if(test1 == 8){
-      latt[ii*N+jj] = latt[(ii-1)*N+(jj+1)];    
     }
   }
 }
 
 
 //criterio de parada cuando se alcanza el consenso 
-bool stop(std::vector<int> &latt){
+bool stop(const std::vector<int> &latt){
   int N = std::sqrt(latt.size());
   unsigned long sum = 0;
   for(int ii = 0 ; ii < N ; ii++){
@@ -297,12 +235,29 @@ bool stop(std::vector<int> &latt){
     }
   }
   if(sum == N*N){
-    std::cout << "win 1" << std::endl;
+    //std::cout << "win 1" << std::endl;
     return true;
   }
-  if(sum == 0){
-    std::cout << "win -1" << std::endl;
+  else if(sum == 0){
+    //std::cout << "win -1" << std::endl;
     return true;
   }
   return false;
+}
+
+bool density(const double & rho,const std::vector<int> &latt){
+  int N = std::sqrt(latt.size());
+  unsigned long sum = 0;
+  for(int ii = 0 ; ii < N ; ii++){
+    for(int jj = 0 ; jj < N ; jj++){
+      sum += latt[ii*N+jj];
+    }
+  }
+
+  if(N*N*rho <= sum){
+    std::cout << sum << std::endl;
+    return false;
+  }
+  
+  return true;
 }
