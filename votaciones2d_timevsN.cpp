@@ -1,8 +1,3 @@
-//para crear el gif descomentar start_gnuplot y print gnuplot, comentar en stop
-//los cout y dentro del buqle de repeticiones el cout
-
-
-//compilar con make vot1 en consola
 #include <iostream>
 #include <random>
 #include <vector>
@@ -12,37 +7,50 @@ void initialize_lattice (const double & rho,std::vector<int> &latt);
 void interaction(std::vector<int> &latt);
 void clean_lattice(std::vector<int> &latt);
 bool density(const double & rho,const std::vector<int> &latt);
-bool stop(const std::vector<int> &latt);
+bool stop(const std::vector<int> &latt,double &test);
 
 int main (void){
+  std::cout.precision(6);
+  std::cout.setf(std::ios::scientific);
   //tamaño de la malla
   const int N = 10;
-
-  //densidad de 1
-  const double rho = 0.9;
+  
+  //densidad de numeros 1
+  double rho = 0.0;
   
   //numero de pasos maximos para alcanzar el consenso
   const int max = 100000; 
-
+  
   //numero de repeticiones
-  const int rep = 1;
+  const int rep = 20;
+  
   //creacion de la malla como vector unidimensional
   std::vector<int> latt (N*N);
-
-  for(int jj = 0; jj < rep; jj++){
-    
-    initialize_lattice(rho,latt);
-
-    for (int ii = 0 ; ii < max ; ii++){
-      interaction(latt);
-      if(stop(latt) == true){
-	std::cout << ii << std::endl;
-      break;
-      }
-    }
-    clean_lattice(latt);
-  }
   
+  //variables para calculo de probabilidad
+  double prob = 0.0;
+  double test = 0.0;
+
+  //buqle para aumentar la densidad de 0.1
+  for(int kk = 0 ; kk < 9; kk++){
+    rho += 0.1;
+    prob = 0.0;
+    //buqle para el conteo de las repeticiones
+    for(int jj = 0; jj < rep; jj++){
+      initialize_lattice(rho,latt);
+      //buqle para la el intercmabio
+      for(int ii = 0 ; ii < max ; ii++){
+	interaction(latt);
+	if(stop(latt,test) == true){
+	  prob += test;
+	  test = 0.0;
+	  break;
+	}
+      }
+      clean_lattice(latt);
+    }
+    std::cout << rho << " " << prob/rep << std::endl;
+  }
   return 0;
 }
 
@@ -226,7 +234,7 @@ void interaction(std::vector<int> &latt){
 
 
 //criterio de parada cuando se alcanza el consenso 
-bool stop(const std::vector<int> &latt){
+bool stop(const std::vector<int> &latt ,  double &test){
   int N = std::sqrt(latt.size());
   unsigned long sum = 0;
   for(int ii = 0 ; ii < N ; ii++){
@@ -235,6 +243,7 @@ bool stop(const std::vector<int> &latt){
     }
   }
   if(sum == N*N){
+    test += 1.0;
     //std::cout << "win 1" << std::endl;
     return true;
   }
@@ -255,7 +264,6 @@ bool density(const double & rho,const std::vector<int> &latt){
   }
 
   if(N*N*rho <= sum){
-    std::cout << sum << std::endl;
     return false;
   }
   
