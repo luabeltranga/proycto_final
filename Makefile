@@ -20,4 +20,4 @@ vot3dV2: votaciones3d_V2.cpp
 	$(CC) $(FLAGS) votaciones3d_V2.cpp
 
 clean:
-	rm -f *.gif *.out *.dat *~
+	rm -f *.gif *.out *.dat *~ *.log
